@@ -7,7 +7,7 @@ pragma solidity>=0.8.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract Auction is IERC721Receiver {
+contract Auction {
     // Variables
 
     // NFTs that are allowed to be exchanged in this contract
@@ -116,7 +116,7 @@ contract Auction is IERC721Receiver {
     }
     
     // Force cancel bid, to prevent DDoS by bidding from contract.
-    function force_remove_bid(address NFTContract, uint256 NFTId) public {
+    function force_remove_auction(address NFTContract, uint256 NFTId) public {
         require(_privilleged_operators[msg.sender] == true, "Operators only");
         require(NFTId >= 0, "Enter a valid NFT id");
         // Remove bid and disable the nft's auction.
@@ -198,11 +198,5 @@ contract Auction is IERC721Receiver {
         emit AuctionOver(NFTContract, NFTId, current_bidder[NFTContract][NFTId]);
     }
     
-    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata) external override returns (bytes4) {
-        // Checks if the NFT contract has been allowed to host auctions
-        require(_allowed_to_exchange[msg.sender], "Contract not approved for hosting auctions"); // NFT contract is the msg.sender
-        // Set token ownership
-        _ownership[msg.sender][tokenId] = from;
-        return bytes4(this.onERC721Received.selector);
-    }
+   
 }
