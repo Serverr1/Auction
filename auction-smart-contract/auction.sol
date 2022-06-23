@@ -18,9 +18,6 @@ contract Auction {
     // contract owner
     address public owner;
     
-    // Interface to halt all auctions.
-    bool public IsHalted;
-    
     // Accounts Balance
     mapping (address => uint256) public balance;
 
@@ -41,9 +38,7 @@ contract Auction {
     event Owner(address newOwner);
     // Admin withdrawal
     event AdminWithDrawal(uint256 amount);
-    // Pause and resume
-    event Pause();
-    event Resume();
+    
     // New Bid Event
     event NewBid(address NFTContract, uint256 NFTId, uint256 price, address bidder);
     // Auction over Event
@@ -99,21 +94,7 @@ contract Auction {
         emit Owner(newOwner);
     }
     
-    // Halt transactions
-    function halt() public {
-        require(_privilleged_operators[msg.sender] == true, "Operator only");
-        require(IsHalted == false, "Transactions have already been halted");
-        IsHalted = true;
-        emit Pause();
-    }
-    
-    // Resume transactions
-    function resume() public {
-        require(_privilleged_operators[msg.sender] == true, "Operator only");
-        require(IsHalted, "Transactions are currently not halted");
-        IsHalted = false;
-        emit Resume();
-    }
+   
     
     // Force cancel bid, to prevent DDoS by bidding from contract.
     function force_remove_auction(address NFTContract, uint256 NFTId) public {
@@ -160,7 +141,7 @@ contract Auction {
 
     // Auction Ops
 
-    function startAuction(address NFTContract, uint256 NFTId, uint256 lowest_price) public isNftOwner(NFTContract, NFTId) {
+    function startAuction(address NFTContract, uint256 NFTId, uint256 lowest_price) public {
         require(onAuction[NFTContract][NFTId] == false, "Already auctioned");
         // 1. Set lowest bid
         current_auction_price[NFTContract][NFTId] = lowest_price;
@@ -169,6 +150,9 @@ contract Auction {
         onAuction[NFTContract][NFTId] = true;
         // 3. Set timestamp
         bid_end_time[NFTContract][NFTId] = block.number + 5760;
+        // 4. Setting the ownership of the contract
+        _ownership[NFTContract][NFTId] = msg.sender;
+        
     }
 
     function bid(address NFTContract, uint256 NFTId) public payable {
