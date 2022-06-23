@@ -1,0 +1,10 @@
+# Auction
+
+This is an auction smart contract written in solidity. 
+- transfer of ownership.
+- Halt and remove transactions(only privilledged operators can do this).
+- allow a specified token to be auctioned.
+- witdrawals
+- starting an auction
+- bidding for an auction
+- claiming of auction
